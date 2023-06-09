@@ -1,0 +1,109 @@
+version: "3"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    environment:
+      - discovery.type=single-node
+      - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
+  axon-server:
+    image: registry.axonops.com/axonops-public/axonops-docker/axon-server:latest
+    environment:
+      - ELASTIC_HOSTS=http://elasticsearch:9200
+  axon-dash:
+    image: registry.axonops.com/axonops-public/axonops-docker/axon-dash:latest
+    command: >
+      /bin/sh -c "sed -i 's|private_endpoints.*|private_endpoints: http://axon-server:8080|' /etc/axonops/axon-dash.yml && /usr/share/axonops/axon-dash --appimage-extract-and-run"
+    ports:
+      - 3000:3000
+
+  axon-agent-0:
+    # image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
+    image: registry.axonops.com/axonops-public/axonops-docker-beta/axon-agent:0.0.60
+    restart: always
+    environment:
+       - AXON_AGENT_SERVER_HOST=axon-server
+       - AXON_AGENT_SERVER_PORT=1888
+       - AXON_AGENT_ORG=demo
+       - AXON_AGENT_TLS_MODE=none
+    volumes:
+      - cassandra-0:/var/lib/cassandra
+      - axonops-0:/var/lib/axonops
+  cassandra-0:
+    image: cassandra:4.0
+    restart: always
+    volumes:
+      - cassandra-0:/var/lib/cassandra
+      - axonops-0:/var/lib/axonops
+    environment:
+      - JVM_EXTRA_OPTS=-javaagent:/var/lib/axonops/axon-cassandra4.0-agent.jar=/etc/axonops/axon-agent.yml
+      - CASSANDRA_CLUSTER_NAME=demo-cluster
+      - CASSANDRA_SEEDS=cassandra-0,cassandra-1
+      - MAX_HEAP_SIZE=256m
+      - HEAP_NEWSIZE=50m
+    command: >
+      /bin/sh -c "mkdir -p /etc/axonops && echo 'axon-agent:' > /etc/axonops/axon-agent.yml && mkdir -p /var/log/axonops && chown cassandra.cassandra /var/log/axonops && /usr/local/bin/docker-entrypoint.sh cassandra -f"
+
+  axon-agent-1:
+#    image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
+    image: registry.axonops.com/axonops-public/axonops-docker-beta/axon-agent:0.0.60
+    restart: always
+    environment:
+       - AXON_AGENT_SERVER_HOST=axon-server
+       - AXON_AGENT_SERVER_PORT=1888
+       - AXON_AGENT_ORG=demo
+       - AXON_AGENT_TLS_MODE=none
+    volumes:
+      - cassandra-1:/var/lib/cassandra
+      - axonops-1:/var/lib/axonops
+  cassandra-1:
+    image: cassandra:4.0
+    restart: always
+    volumes:
+      - cassandra-1:/var/lib/cassandra
+      - axonops-1:/var/lib/axonops
+    environment:
+      - JVM_EXTRA_OPTS=-javaagent:/var/lib/axonops/axon-cassandra4.0-agent.jar=/etc/axonops/axon-agent.yml
+      - CASSANDRA_CLUSTER_NAME=demo-cluster
+      - CASSANDRA_SEEDS=cassandra-0,cassandra-1
+      - MAX_HEAP_SIZE=256m
+      - HEAP_NEWSIZE=50m
+    command: >
+      /bin/sh -c "mkdir -p /etc/axonops && echo 'axon-agent:' > /etc/axonops/axon-agent.yml && mkdir -p /var/log/axonops && chown cassandra.cassandra /var/log/axonops && /usr/local/bin/docker-entrypoint.sh cassandra -f"
+
+  axon-agent-2:
+#    image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
+    image: registry.axonops.com/axonops-public/axonops-docker-beta/axon-agent:0.0.60
+    restart: always
+    environment:
+       - AXON_AGENT_SERVER_HOST=axon-server
+       - AXON_AGENT_SERVER_PORT=1888
+       - AXON_AGENT_ORG=demo
+       - AXON_AGENT_TLS_MODE=none
+    volumes:
+      - cassandra-2:/var/lib/cassandra
+      - axonops-2:/var/lib/axonops
+  cassandra-2:
+    image: cassandra:4.0
+    restart: always
+    volumes:
+      - cassandra-2:/var/lib/cassandra
+      - axonops-2:/var/lib/axonops
+    environment:
+      - JVM_EXTRA_OPTS=-javaagent:/var/lib/axonops/axon-cassandra4.0-agent.jar=/etc/axonops/axon-agent.yml
+      - CASSANDRA_CLUSTER_NAME=demo-cluster
+      - CASSANDRA_SEEDS=cassandra-0,cassandra-1
+      - MAX_HEAP_SIZE=256m
+      - HEAP_NEWSIZE=50m
+    command: >
+      /bin/sh -c "mkdir -p /etc/axonops && echo 'axon-agent:' > /etc/axonops/axon-agent.yml && mkdir -p /var/log/axonops && chown cassandra.cassandra /var/log/axonops && /usr/local/bin/docker-entrypoint.sh cassandra -f"
+
+volumes:
+  cassandra-0:
+  axonops-0:
+  cassandra-1:
+  axonops-1:
+  cassandra-2:
+  axonops-2:
+
+
