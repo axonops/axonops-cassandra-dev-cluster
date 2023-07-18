@@ -18,8 +18,7 @@ services:
       - 3000:3000
 
   axon-agent-0:
-    # image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
-    image: registry.axonops.com/axonops-public/axonops-docker-beta/axon-agent:0.0.60
+    image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
     restart: always
     environment:
        - AXON_AGENT_SERVER_HOST=axon-server
@@ -45,8 +44,7 @@ services:
       /bin/sh -c "mkdir -p /etc/axonops && echo 'axon-agent:' > /etc/axonops/axon-agent.yml && mkdir -p /var/log/axonops && chown cassandra.cassandra /var/log/axonops && /usr/local/bin/docker-entrypoint.sh cassandra -f"
 
   axon-agent-1:
-#    image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
-    image: registry.axonops.com/axonops-public/axonops-docker-beta/axon-agent:0.0.60
+    image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
     restart: always
     environment:
        - AXON_AGENT_SERVER_HOST=axon-server
@@ -72,8 +70,7 @@ services:
       /bin/sh -c "mkdir -p /etc/axonops && echo 'axon-agent:' > /etc/axonops/axon-agent.yml && mkdir -p /var/log/axonops && chown cassandra.cassandra /var/log/axonops && /usr/local/bin/docker-entrypoint.sh cassandra -f"
 
   axon-agent-2:
-#    image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
-    image: registry.axonops.com/axonops-public/axonops-docker-beta/axon-agent:0.0.60
+    image: registry.axonops.com/axonops-public/axonops-docker/axon-agent:latest
     restart: always
     environment:
        - AXON_AGENT_SERVER_HOST=axon-server
