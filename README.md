@@ -1,4 +1,3 @@
-
 # AxonOps Cassandra Development Cluster
 
 This Docker Compose file will create a Cassandra cluster containing 3 nodes along with AxonOps for
@@ -18,13 +17,10 @@ Once the cluster has started up you can run `cqlsh` inside one of the Cassandra 
 docker compose exec -it cassandra-0 cqlsh
 ```
 
-By default the Cassandra ports are not exposed outside the Docker network. If you need to access Cassandra
-from other applications this can be achieved by adding a `ports` section to one of the Cassandra node definitions,
-for example:
-```yaml
-  cassandra-0:
-    image: cassandra:4.0
-    ports:
-      - 9042:9042
-...
+The CQL port for each node is also exposed on a loopback IP address as follows:
 ```
+cassandra-0: 127.0.1.10:9042
+cassandra-1: 127.0.1.11:9042
+cassandra-2: 127.0.1.12:9042
+```
+Client applications running on the host should be able to use these addresses to connect to Cassandra.

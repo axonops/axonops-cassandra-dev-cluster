@@ -51,7 +51,8 @@ services:
       - CASSANDRA_SEEDS=cassandra-0
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=dc1
-      - CASSANDRA_RACK=rack1
+      - CASSANDRA_RACK=rack0
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=127.0.1.10
       - MAX_HEAP_SIZE=256m
       - HEAP_NEWSIZE=50m
       - AXON_AGENT_SERVER_HOST=axon-server
@@ -59,6 +60,8 @@ services:
       - AXON_AGENT_ORG=demo
       - AXON_AGENT_TLS_MODE=none
       - AXON_AGENT_LOG_OUTPUT=file
+    ports:
+      - 127.0.1.10:9042:9042
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "9042"]
       interval: 10s
@@ -80,7 +83,8 @@ services:
       - CASSANDRA_SEEDS=cassandra-0
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=dc1
-      - CASSANDRA_RACK=rack2
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=127.0.1.11
       - MAX_HEAP_SIZE=256m
       - HEAP_NEWSIZE=50m
       - AXON_AGENT_SERVER_HOST=axon-server
@@ -88,6 +92,8 @@ services:
       - AXON_AGENT_ORG=demo
       - AXON_AGENT_TLS_MODE=none
       - AXON_AGENT_LOG_OUTPUT=file
+    ports:
+      - 127.0.1.11:9042:9042
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "9042"]
       interval: 10s
@@ -109,7 +115,8 @@ services:
       - CASSANDRA_SEEDS=cassandra-0
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       - CASSANDRA_DC=dc1
-      - CASSANDRA_RACK=rack3
+      - CASSANDRA_RACK=rack2
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=127.0.1.12
       - MAX_HEAP_SIZE=256m
       - HEAP_NEWSIZE=50m
       - AXON_AGENT_SERVER_HOST=axon-server
@@ -117,6 +124,8 @@ services:
       - AXON_AGENT_ORG=demo
       - AXON_AGENT_TLS_MODE=none
       - AXON_AGENT_LOG_OUTPUT=file
+    ports:
+      - 127.0.1.12:9042:9042
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "9042"]
       interval: 10s
