@@ -17,10 +17,10 @@ Once the cluster has started up you can run `cqlsh` inside one of the Cassandra 
 docker compose exec -it cassandra-0 cqlsh
 ```
 
-The CQL port for each node is also exposed on a loopback IP address as follows:
+The CQL port for each node is also exposed on the loopback IP address as follows:
 ```
-cassandra-0: 127.0.1.10:9042
-cassandra-1: 127.0.1.11:9042
-cassandra-2: 127.0.1.12:9042
+cassandra-0: 127.0.0.1:9042
+cassandra-1: 127.0.0.1:9043
+cassandra-2: 127.0.0.1:9044
 ```
 Client applications running on the host should be able to use these addresses to connect to Cassandra.
