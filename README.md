@@ -3,6 +3,15 @@
 This Docker Compose file will create a Cassandra cluster containing 3 nodes along with AxonOps for
 cluster monitoring and management.
 
+You can deploy this AxonOps development environment to AWS by using the following link. Otherwise, follow the
+instructions below for a manual installation.
+
+
+[![Launch in AWS](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png 'Launch in AWS')](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://axonops-cloudformation-public.s3.amazonaws.com/axonops.yaml)
+
+> [!IMPORTANT]  
+> AWS deployment will incur a cost.
+
 ## Getting Started
 
 ### Prerequisites
