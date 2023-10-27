@@ -7,7 +7,7 @@ You can deploy this AxonOps development environment to AWS by using the followin
 instructions below for a manual installation.
 
 
-[![Launch in AWS](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png 'Launch in AWS')](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://axonops-cloudformation-public.s3.amazonaws.com/axonops.yaml)
+[![Launch in AWS](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png 'Launch in AWS')](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://axonops-cassandra-dev-cluster-cloudformation.s3.amazonaws.com/axonops.yaml)
 
 > [!IMPORTANT]  
 > AWS deployment will incur a cost.
