@@ -73,3 +73,17 @@ To shut down the cluster and remove all data use this command:
 docker compose down -v
 ```
 This will stop and remove all running containers and delete the Docker volumes containing the Cassandra and AxonOps data.
+
+### Running different Cassandra versions
+
+This Docker Compose environment supports Cassandra 4.0, 4.1 and 5.0 (currently in beta). The default version is 5.0 but
+you can run 4.0 or 4.1 by changing the image tag for the Cassandra containers in `docker-compose.yml`.
+
+For example to run Cassandra 4.1 change the `image` line for the 3 Cassandra containers from this:
+```
+image: registry.axonops.com/axonops-public/axonops-docker/cassandra:5.0
+```
+to this:
+```
+image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
+```
