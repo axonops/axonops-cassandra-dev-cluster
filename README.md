@@ -11,6 +11,7 @@ instructions below for a manual installation.
 
 > [!IMPORTANT]  
 > AWS deployment will incur a cost.
+> This project currently works on x86 architecture only. Apple Silicon / ARM are currently not supported.
 
 ## Getting Started
 
