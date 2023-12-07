@@ -21,6 +21,8 @@ This environment requires a recent version of Docker (Docker Engine 19.03.0 or l
 If you do not have Docker installed the easiest way to get started is to install Docker Desktop which you can
 find at [docker.com](https://docker.com/).
 
+> Please note this environment only supports amd64 architecture. ARM CPUs (e.g. Apple M1/M2) are not currently supported.
+
 If you already have Docker installed then check your versions using these commands:
 ```bash
 docker version
