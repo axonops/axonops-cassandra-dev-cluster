@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+data:
+  axon-agent.yml: |
+    axon-server:
+        hosts: "agents.axonops.cloud"
+    axon-agent:
+        key: REPLACE_ME
+        org: REPLACE_ME
+    disable_command_exec: false
+    kubeconfig:
+      cadvisor:
+        enabled: false
+        namespace: kube-system
+kind: ConfigMap
+metadata:
+  namespace: axonops
+  name: axonops-agent-config

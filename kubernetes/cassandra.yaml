@@ -1,0 +1,196 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-probe-config
+  namespace: axonops
+  labels:
+    name: cassandra-probe-config
+data:
+  probe: |
+    if [[ $(nodetool status | grep $POD_IP) == *"UN"* ]]; then
+       if [[ $DEBUG ]]; then
+          echo "UN";
+       fi
+       exit 0;
+    else
+       if [[ $DEBUG ]]; then
+          echo "Not Up";
+       fi
+       exit 1;
+    fi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cassandra
+  namespace: axonops
+  labels:
+    app: cassandra
+spec:
+  serviceName: cassandra
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cassandra
+  template:
+    metadata:
+      labels:
+        app: cassandra
+    spec:
+      serviceAccount: axonops
+      serviceAccountName: axonops
+      volumes:
+        - name: cassandra-data-tb
+          emptyDir: {}
+        - name: cassandra-probe-config
+          configMap:
+            name: cassandra-probe-config
+            items:
+              - key: probe
+                path: ready-probe.sh
+                mode: 0777
+        - name: axonops-agent-config
+          configMap:
+            name: axonops-agent-config
+        - name: axonops-shared
+          emptyDir: {}
+        - name: axonops-logs
+          emptyDir: {}
+        - name: cassandra-logs
+          emptyDir: {}
+      terminationGracePeriodSeconds: 1800
+      initContainers:
+        - name: axonops-init
+          image: busybox:1.34.1
+          command: ['sh', '-c', 'cp /etc/axonops/axon-agent.yml /var/lib/axonops/axon-agent.yml']
+          env:
+            - name: AXON_SHARED_VOLUME
+              value: /var/lib/axonops
+          volumeMounts:
+            - name: axonops-agent-config
+              mountPath: /etc/axonops
+            - name: axonops-shared
+              mountPath: /var/lib/axonops
+      containers:
+        - name: "axon-agent"
+          image: europe-docker.pkg.dev/axonops-public/axonops-docker/axon-agent:1.0.63
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: axonops-agent-config
+              mountPath: /etc/axonops
+            - name: axonops-shared
+              mountPath: /var/lib/axonops
+            - name: cassandra-logs
+              mountPath: /opt/cassandra/logs
+          env:
+            - name: AXON_AGENT_NTP_TIMEOUT
+              value: "6"
+            - name: LOG_OUTPUT
+              value: std
+            - name: AXON_AGENT_ARGS
+              value: "-o file"
+            - name: CASSANDRA_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CASSANDRA_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CASSANDRA_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: CASSANDRA_POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+        - name: cassandra
+          image: cassandra:5.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7000
+              name: intra-node
+            - containerPort: 7001
+              name: tls-intra-node
+            - containerPort: 7199
+              name: jmx
+            - containerPort: 9042
+              name: cql
+            - containerPort: 9160
+              name: thrift
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 500Mi
+            limits:
+              cpu: "1"
+              memory: 1024Mi
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - nodetool drain
+          env:
+            - name: CASSANDRA_SEEDS
+              value: "cassandra-0.cassandra.axonops.svc.cluster.local"
+            - name: CASSANDRA_CLUSTER_NAME
+              value: "AxonOps"
+            - name: CASSANDRA_DC
+              value: "london"
+            - name: CASSANDRA_AUTO_BOOTSTRAP
+              value: "false"
+            - name: HEAP_NEWSIZE
+              value: "100M"
+            - name: MAX_HEAP_SIZE
+              value: "512M"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: JVM_EXTRA_OPTS
+              value: "-javaagent:/var/lib/axonops/axon-cassandra5.0-agent.jar=/var/lib/axonops/axon-agent.yml"
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - /probe/ready-probe.sh
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: cassandra-probe-config
+              mountPath: /probe
+            - name: cassandra-data-tb
+              mountPath: /var/lib/cassandra
+              readOnly: false
+            - name: axonops-agent-config
+              mountPath: /etc/axonops
+            - name: axonops-shared
+              mountPath: /var/lib/axonops
+              readOnly: false
+            - name: axonops-logs
+              mountPath: /var/log/axonops
+            - name: cassandra-logs
+              mountPath: /opt/cassandra/logs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cassandra
+  name: cassandra
+  namespace: axonops
+spec:
+  clusterIP: None
+  ports:
+    - port: 9042
+  selector:
+    app: cassandra
