@@ -25,6 +25,8 @@ Select `enabled: true` in this case and amend the namespace where cadvisor is in
 
 ## Configuration
 
+### Namespace
+
 This template uses the `axonops` namespace. If you prefer to use another name, you'll need to update the following:
 
 - All entries or `namepace: axonops`
@@ -33,6 +35,8 @@ This template uses the `axonops` namespace. If you prefer to use another name, y
 ```
 "cassandra-0.cassandra.axonops.svc.cluster.local" => "cassandra-0.cassandra.NAMESPACE.svc.cluster.local"
 ```
+
+### Limits
 
 You may also need to update the limits for your set up 
 
@@ -45,6 +49,10 @@ You may also need to update the limits for your set up
               cpu: "1"
               memory: 1024Mi
 ```
+
+### Replicas
+
+The default is to start up three cassandra nodes. Adjust the [replica count](cassandra.yaml) if you would like more.
 
 ## k3s
 
@@ -62,5 +70,7 @@ docker-compose up
 
 ```sh
 kubectl create ns axonops
-kubectl apply -f .
+kubectl apply -f axonops-sa.yaml
+kubectl apply -f axonops.yaml
+kubectl apply -f cassandra.yaml
 ```

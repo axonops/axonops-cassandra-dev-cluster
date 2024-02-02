@@ -73,7 +73,7 @@ spec:
               mountPath: /var/lib/axonops
       containers:
         - name: "axon-agent"
-          image: europe-docker.pkg.dev/axonops-public/axonops-docker/axon-agent:1.0.63
+          image: europe-docker.pkg.dev/axonops-public/axonops-docker/axon-agent:latest
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: axonops-agent-config
