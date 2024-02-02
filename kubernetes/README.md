@@ -1,4 +1,9 @@
-# Cassandra with AxonOps in Docker
+# Cassandra with AxonOps in Kubernetes
+
+The following configuration can be used to create an Apache Cassandra cluster that uses
+[AxonOps](https://axonops.com) for monitoring. Whilst the [docker-compose](../docker-comopse.yml) in the 
+parent directory is meant to run a local AxonOps server with all its dependencies,
+this Kubernetes condfiguration uses the AxonOps SaaS platform.
 
 ## AxonOps Agent
 
@@ -22,6 +27,7 @@ Then, edit the `axonops.yaml` config to look like:
 
 If you use `cadvisor` in your cluster, you'll be able to get additional disk metrics.
 Select `enabled: true` in this case and amend the namespace where cadvisor is installed if required
+
 
 ## Configuration
 
