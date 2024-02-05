@@ -7,23 +7,25 @@ this Kubernetes condfiguration uses the AxonOps SaaS platform.
 
 ## AxonOps Agent
 
-Please log in to https://console.axonops.cloud and follow the intructions to get
-and organization and an agent key.
 
-Then, edit the `axonops.yaml` config to look like:
+The main configuration for AxonOps is the [axonops.yaml](./resources/axonops.yaml) config file.
 
 ```yaml
     axon-server:
-        hosts: "agents.axonops.cloud"
+        hosts: "axon-server-svc"
+        port: 1888
     axon-agent:
-        key: your-key
-        org: your-org
+        org: demo
+        tls:
+          mode: "disabled"
     disable_command_exec: false
     kubeconfig:
       cadvisor:
         enabled: false
         namespace: kube-system
 ```
+
+The defaults are probably good for most people.
 
 If you use `cadvisor` in your cluster, you'll be able to get additional disk metrics.
 Select `enabled: true` in this case and amend the namespace where cadvisor is installed if required
@@ -76,7 +78,5 @@ docker-compose up
 
 ```sh
 kubectl create ns axonops
-kubectl apply -f axonops-sa.yaml
-kubectl apply -f axonops.yaml
-kubectl apply -f cassandra.yaml
+kubectl apply -f resources/
 ```
