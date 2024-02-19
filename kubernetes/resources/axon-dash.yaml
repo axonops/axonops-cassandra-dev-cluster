@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: axon-dash
+  namespace: axonops
+  labels:
+    name: axon-dash
+data:
+  axon-dash.yml: |
+    axon-dash:
+      host: 0.0.0.0
+      port: 3000
+      line_charts_max_results: 256
+
+    axon-server:
+      private_endpoints: "http://axon-server-svc:8080"
+      context_path: ""
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: axon-dash
+  name: axon-dash
+  namespace: axonops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: axon-dash
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: axon-dash
+    spec:
+      containers:
+      - image: registry.axonops.com/axonops-public/axonops-docker/axon-dash:latest
+        name: axon-dash
+        resources: {}
+        ports:
+          - containerPort: 3000
+            name: http
+        volumeMounts:
+          - name: axon-dash
+            mountPath: /etc/axonops
+        env:
+          - name: AXON_DASH_PORT
+            value: "3000"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 3
+      volumes:
+        - name: axon-dash
+          configMap:
+            name: axon-dash
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: axon-dash-svc
+  namespace: axonops
+  labels:
+    app: axon-dash
+spec:
+  selector:
+    app: axon-dash
+  ports:
+    - port: 3000
+      name: http
