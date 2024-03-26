@@ -41,7 +41,7 @@ services:
       start_period: 10s
 
   cassandra-0:
-    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:5.0
+    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
     hostname: cassandra-0
     restart: always
     volumes:
@@ -74,7 +74,7 @@ services:
     depends_on:
       cassandra-0:
         condition: service_healthy
-    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:5.0
+    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
     hostname: cassandra-1
     restart: always
     volumes:
@@ -107,7 +107,7 @@ services:
     depends_on:
       cassandra-1:
         condition: service_healthy
-    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:5.0
+    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
     hostname: cassandra-2
     restart: always
     volumes:

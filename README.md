@@ -76,14 +76,14 @@ This will stop and remove all running containers and delete the Docker volumes c
 
 ### Running different Cassandra versions
 
-This Docker Compose environment supports Cassandra 4.0, 4.1 and 5.0 (currently in beta). The default version is 5.0 but
-you can run 4.0 or 4.1 by changing the image tag for the Cassandra containers in `docker-compose.yml`.
+This Docker Compose environment supports Cassandra 4.0, 4.1 and 5.0 (currently in beta). The default version is 4.1 but
+you can run 4.0 or test 5.0 by changing the image tag for the Cassandra containers in `docker-compose.yml`.
 
-For example to run Cassandra 4.1 change the `image` line for the 3 Cassandra containers from this:
+For example to run Cassandra 4.0 change the `image` line for the 3 Cassandra containers from this:
 ```
-image: registry.axonops.com/axonops-public/axonops-docker/cassandra:5.0
+image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
 ```
 to this:
 ```
-image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
+image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.0
 ```
