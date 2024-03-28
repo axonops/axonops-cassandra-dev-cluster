@@ -59,7 +59,7 @@ spec:
       terminationGracePeriodSeconds: 1800
       containers:
         - name: cassandra
-          image: registry.axonops.com/axonops-public/axonops-docker/cassandra:5.0
+          image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
           imagePullPolicy: Always
           ports:
             - containerPort: 7000
@@ -74,8 +74,8 @@ spec:
               name: thrift
           resources:
             requests:
-              cpu: "500m"
-              memory: 500Mi
+              cpu: "4.1m"
+              memory: 4.1Mi
             limits:
               cpu: "1"
               memory: 1024Mi
