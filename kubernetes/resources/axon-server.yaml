@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: axon-server
+  name: axon-server
+  namespace: axonops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: axon-server
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: axon-server
+    spec:
+      containers:
+      - image: registry.axonops.com/axonops-public/axonops-docker/axon-server:latest
+        name: axon-server
+        resources: {}
+        env:
+          - name: ELASTIC_HOSTS
+            value: http://elastic:changeme@elasticsearch:9200
+        ports:
+          - containerPort: 1888
+            name: data
+          - containerPort: 8080
+            name: http
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: axon-server-svc
+  namespace: axonops
+  labels:
+    app: axon-server
+spec:
+  selector:
+    app: axon-server
+  ports:
+    - port: 1888
+      name: data
+    - port: 8080
+      name: http

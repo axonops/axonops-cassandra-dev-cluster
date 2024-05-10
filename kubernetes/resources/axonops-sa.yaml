@@ -1,0 +1,53 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: axonops-cadvisor
+  namespace: axonops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: axonops-cadvisor
+subjects:
+- kind: ServiceAccount
+  name: axonops
+  namespace: axonops
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: axonops
+  name: axonops
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: axonops-cadvisor
+  namespace: axonops
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/metrics
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - "metrics.k8s.io"
+  resources:
+  - nodes
+  - nodes/metrics
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+
+
