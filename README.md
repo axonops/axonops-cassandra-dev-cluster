@@ -3,17 +3,18 @@
 This Docker Compose file will create a Cassandra cluster containing 3 nodes along with AxonOps for
 cluster monitoring and management.
 
+## Getting Started
+
+### One-click deploy to AWS
+
 You can deploy this AxonOps development environment to AWS by using the following link. Otherwise, follow the
 instructions below for a manual installation.
-
 
 [![Launch in AWS](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png 'Launch in AWS')](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://axonops-cassandra-dev-cluster-cloudformation.s3.amazonaws.com/axonops.yaml)
 
 > [!IMPORTANT]  
 > AWS deployment will incur a cost.
 > This project currently works on x86 architecture only. Apple Silicon / ARM are currently not supported.
-
-## Getting Started
 
 ### Prerequisites
 
@@ -31,7 +32,7 @@ docker compose version
 On Linux you may need to install the `docker-compose-plugin` package in order for Docker Compose to work.
 
 ### Start up
-1. Download [docker-compose.yml](https://github.com/axonops/axonops-cassandra-dev-cluster/blob/main/docker-compose.yml) from this repository, or use this command to download it from the command-line:
+1. Download [docker-compose.yml](https://raw.githubusercontent.com/axonops/axonops-cassandra-dev-cluster/main/docker-compose.yml) from this repository, or use this command to download it from the command-line:
 ```bash
 curl -O https://raw.githubusercontent.com/axonops/axonops-cassandra-dev-cluster/main/docker-compose.yml
 ```
@@ -74,16 +75,27 @@ docker compose down -v
 ```
 This will stop and remove all running containers and delete the Docker volumes containing the Cassandra and AxonOps data.
 
+### Keeping up-to-date
+
+Use this command to download the latest versions of the container images used by this project:
+```bash
+docker compose pull
+```
+
 ### Running different Cassandra versions
 
-This Docker Compose environment supports Cassandra 4.0, 4.1 and 5.0 (currently in beta). The default version is 4.1 but
-you can run 4.0 or test 5.0 by changing the image tag for the Cassandra containers in `docker-compose.yml`.
+This Docker Compose environment supports Cassandra 4.0, 4.1 and 5.0. The default version is 5.0 but
+you can run 4.0 or 4.1 by setting the `CASSANDRA_VERSION` environment variable before starting up the containers.
 
-For example to run Cassandra 4.0 change the `image` line for the 3 Cassandra containers from this:
+For example to start the cluster with Cassandra 4.0:
+```bash
+CASSANDRA_VERSION=4.0 docker compose up -d
 ```
-image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
+Alternatively to avoid specifying the Cassandra version on the command-line every time you can place the
+`CASSANDRA_VERSION` variable in a file named `.env` in the same directory as `docker-compose.yml`. For example:
+```bash
+echo 'CASSANDRA_VERSION=4.0' >.env
+docker compose up -d
 ```
-to this:
-```
-image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.0
-```
+
+The supported values for `CASSANDRA_VERSION` are `5.0`, `4.1` or `4.0`.

@@ -1,8 +1,6 @@
-version: "3.8"
-
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.12
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.24
     environment:
       - discovery.type=single-node
       - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
@@ -41,7 +39,7 @@ services:
       start_period: 10s
 
   cassandra-0:
-    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
+    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:${CASSANDRA_VERSION:-5.0}
     hostname: cassandra-0
     restart: always
     volumes:
@@ -74,7 +72,7 @@ services:
     depends_on:
       cassandra-0:
         condition: service_healthy
-    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
+    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:${CASSANDRA_VERSION:-5.0}
     hostname: cassandra-1
     restart: always
     volumes:
@@ -107,7 +105,7 @@ services:
     depends_on:
       cassandra-1:
         condition: service_healthy
-    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:4.1
+    image: registry.axonops.com/axonops-public/axonops-docker/cassandra:${CASSANDRA_VERSION:-5.0}
     hostname: cassandra-2
     restart: always
     volumes:
