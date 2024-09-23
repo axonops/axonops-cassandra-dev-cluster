@@ -3,9 +3,7 @@
 This Docker Compose file will create a Cassandra cluster containing 3 nodes along with AxonOps for
 cluster monitoring and management.
 
-## Getting Started
-
-### One-click deploy to AWS
+## One-click deploy to AWS
 
 You can deploy this AxonOps development environment to AWS by using the following link. Otherwise, follow the
 instructions below for a manual installation.
@@ -15,6 +13,8 @@ instructions below for a manual installation.
 > [!IMPORTANT]  
 > AWS deployment will incur a cost.
 > This project currently works on x86 architecture only. Apple Silicon / ARM are currently not supported.
+
+## Getting Started
 
 ### Prerequisites
 
