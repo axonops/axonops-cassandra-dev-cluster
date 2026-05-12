@@ -1,23 +1,27 @@
 services:
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.24
+  axondb-search:
+    image: ghcr.io/axonops/axondb-search:3.3.2-1.5.0
     environment:
       - discovery.type=single-node
-      - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
+      - OPENSEARCH_HEAP_SIZE=512m
     volumes:
-      - elasticsearch:/var/lib/elasticsearch
+      - axondb-search:/var/lib/opensearch
     healthcheck:
-      test: ["CMD", "curl", "-sSf", "127.0.0.1:9200"]
+      test: ["CMD", "/usr/local/bin/healthcheck.sh", "readiness"]
       interval: 10s
       timeout: 5s
-      start_period: 30s
+      retries: 10
+      start_period: 120s
   axon-server:
     depends_on:
-      elasticsearch:
+      axondb-search:
         condition: service_healthy
     image: registry.axonops.com/axonops-public/axonops-docker/axon-server:latest
     environment:
-      - ELASTIC_HOSTS=http://elasticsearch:9200
+      - SEARCH_DB_HOSTS=https://axondb-search:9200
+      - SEARCH_DB_USERNAME=admin
+      - SEARCH_DB_PASSWORD=MyS3cur3P@ss2025
+      - SEARCH_DB_SKIP_VERIFY=true
     healthcheck:
       test: ["CMD", "curl", "-sf", "127.0.0.1:8080"]
       interval: 10s
@@ -135,7 +139,7 @@ services:
       start_period: 60s
 
 volumes:
-  elasticsearch:
+  axondb-search:
   cassandra-0:
   cassandra-1:
   cassandra-2:

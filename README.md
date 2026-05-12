@@ -1,7 +1,18 @@
+<p align="center">
+  <a href="https://axonops.com">
+    <img src="https://digitalis-marketplace-assets.s3.us-east-1.amazonaws.com/AxonopsDigitalMaster_AxonopsFullLogoBlue.jpg" alt="AxonOps" width="300">
+  </a>
+</p>
+
+<p align="center">
+  <em>Built and maintained by <a href="https://axonops.com">AxonOps</a></em>
+</p>
+
 # AxonOps Cassandra Development Cluster
 
 This Docker Compose file will create a Cassandra cluster containing 3 nodes along with AxonOps for
-cluster monitoring and management.
+cluster monitoring and management. The stack uses AxonOps-built containers throughout, including
+`axondb-search` (OpenSearch 3.3.2) as the search backend.
 
 ## One-click deploy to AWS
 
@@ -99,3 +110,41 @@ docker compose up -d
 ```
 
 The supported values for `CASSANDRA_VERSION` are `5.0`, `4.1` or `4.0`.
+
+## Search backend (axondb-search / OpenSearch)
+
+The `axondb-search` service uses the AxonOps-built OpenSearch image
+(`ghcr.io/axonops/axondb-search`). TLS and the OpenSearch security plugin
+are enabled by default. The service ships with a hardcoded default admin
+account:
+
+| Setting   | Value                |
+|-----------|----------------------|
+| Username  | `admin`              |
+| Password  | `MyS3cur3P@ss2025`   |
+| Endpoint  | `https://axondb-search:9200` (in-network) |
+| TLS       | Self-signed, generated on first start |
+
+`axon-server` is wired to the backend via environment variables only
+(`SEARCH_DB_HOSTS`, `SEARCH_DB_USERNAME`, `SEARCH_DB_PASSWORD`,
+`SEARCH_DB_SKIP_VERIFY=true`). No config file is mounted.
+
+To rotate the admin credentials, set `AXONOPS_SEARCH_USER` and
+`AXONOPS_SEARCH_PASSWORD` on the `axondb-search` service and mirror the
+same values into `SEARCH_DB_USERNAME` / `SEARCH_DB_PASSWORD` on
+`axon-server`.
+
+## About AxonOps
+
+[AxonOps](https://axonops.com) is the operational platform for Apache Cassandra
+and Apache Kafka. AxonOps provides monitoring, alerting, backup, repair, and
+configuration management for distributed data infrastructure at scale, helping
+teams run their clusters with confidence in production.
+
+This project is maintained by [AxonOps](https://axonops.com). For support,
+visit [axonops.com/contact](https://axonops.com/contact).
+
+## License
+
+This project is licensed under the Apache License 2.0 — see the
+[LICENSE](LICENSE) file for details.

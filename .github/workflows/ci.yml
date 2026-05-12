@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    name: docker compose smoke test (Cassandra ${{ matrix.cassandra }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cassandra: ["5.0"]
+    env:
+      CASSANDRA_VERSION: ${{ matrix.cassandra }}
+      COMPOSE_PROJECT_NAME: axonops-ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet
+
+      - name: Pull images
+        run: docker compose pull --quiet
+
+      - name: Start core stack (search + server + dash)
+        run: docker compose up -d axondb-search axon-server axon-dash
+
+      - name: Wait for core services to become healthy
+        run: |
+          set -euo pipefail
+          for svc in axondb-search axon-server axon-dash; do
+            echo "::group::Waiting for $svc"
+            for i in $(seq 1 60); do
+              status=$(docker inspect --format='{{.State.Health.Status}}' "$(docker compose ps -q "$svc")" 2>/dev/null || echo "unknown")
+              echo "[$i] $svc: $status"
+              if [ "$status" = "healthy" ]; then break; fi
+              if [ "$status" = "unhealthy" ]; then
+                echo "::error::$svc became unhealthy"
+                docker compose logs "$svc" | tail -100
+                exit 1
+              fi
+              sleep 5
+            done
+            if [ "$status" != "healthy" ]; then
+              echo "::error::$svc did not become healthy in time"
+              docker compose logs "$svc" | tail -100
+              exit 1
+            fi
+            echo "::endgroup::"
+          done
+
+      - name: Verify OpenSearch is reachable with TLS + auth
+        run: |
+          docker compose exec -T axondb-search \
+            curl -sSf -k -u admin:'MyS3cur3P@ss2025' \
+            https://127.0.0.1:9200/_cluster/health | tee /tmp/health.json
+          grep -q '"status":"\(green\|yellow\)"' /tmp/health.json
+
+      - name: Verify axon-server connected to search backend
+        run: |
+          if docker compose logs axon-server 2>&1 | grep -iE 'search.*(error|fail|refused)'; then
+            echo "::error::axon-server reports search backend errors"
+            docker compose logs axon-server | tail -100
+            exit 1
+          fi
+
+      - name: Verify axon-dash HTTP responds
+        run: curl -sSf --retry 10 --retry-delay 3 http://localhost:3000/ -o /dev/null
+
+      - name: Start full stack (Cassandra nodes)
+        run: docker compose up -d
+
+      - name: Wait for Cassandra nodes to become healthy
+        run: |
+          set -euo pipefail
+          for svc in cassandra-0 cassandra-1 cassandra-2; do
+            echo "::group::Waiting for $svc"
+            for i in $(seq 1 90); do
+              status=$(docker inspect --format='{{.State.Health.Status}}' "$(docker compose ps -q "$svc")" 2>/dev/null || echo "unknown")
+              echo "[$i] $svc: $status"
+              if [ "$status" = "healthy" ]; then break; fi
+              sleep 5
+            done
+            if [ "$status" != "healthy" ]; then
+              echo "::error::$svc did not become healthy"
+              docker compose logs "$svc" | tail -100
+              exit 1
+            fi
+            echo "::endgroup::"
+          done
+
+      - name: Verify Cassandra cluster has 3 nodes UN
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            up=$(docker compose exec -T cassandra-0 nodetool status 2>/dev/null | awk '/^UN/{c++} END{print c+0}')
+            echo "[$i] UN nodes: $up"
+            if [ "$up" -eq 3 ]; then exit 0; fi
+            sleep 10
+          done
+          echo "::error::Did not observe 3 UN nodes"
+          docker compose exec -T cassandra-0 nodetool status || true
+          exit 1
+
+      - name: Dump container status on failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs --tail=200
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v --remove-orphans
