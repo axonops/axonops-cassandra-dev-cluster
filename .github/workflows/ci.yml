@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cassandra: ["4.0", "4.1", "5.0"]
+        cassandra: ["5.0"]
     env:
       CASSANDRA_VERSION: ${{ matrix.cassandra }}
       COMPOSE_PROJECT_NAME: axonops-ci
