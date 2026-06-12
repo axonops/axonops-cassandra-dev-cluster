@@ -1,6 +1,6 @@
 services:
   axondb-search:
-    image: ghcr.io/axonops/axondb-search:3.3.2-1.5.0
+    image: ghcr.io/axonops/axondb-search:3.7.0
     environment:
       - discovery.type=single-node
       - OPENSEARCH_HEAP_SIZE=512m
